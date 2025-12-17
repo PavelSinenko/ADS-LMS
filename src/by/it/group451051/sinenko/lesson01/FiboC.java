@@ -25,9 +25,45 @@ public class FiboC {
         //Решение сложно найти интуитивно
         //возможно потребуется дополнительный поиск информации
         //см. период Пизано
-        return 0L;
+
+        int period = findPisanoPeriod(m); // находим сколько чисел в цикле для модуля m
+    
+        long reducedN = n % period;  // уменьшаем n по модулю периода
+        
+        return fibonacciModul(reducedN, m); // вычисляем Fibo (reducedN) % m
     }
-
-
+    
+    private int findPisanoPeriod(int m) { // находит длину периода
+        if (m == 1) return 1;     // базовый случай
+        
+        int prev = 0;    // первые числа фибоначчи по модулю m 
+        int curr = 1;
+        
+        for (int i = 0; i < m * 6; i++) {   
+            int next = (prev + curr) % m;   // вычисление следующего остатка
+            prev = curr;   // сдвиг значений для следующей итерации
+            curr = next;
+            
+            if (prev == 0 && curr == 1) {   // проверка на повторение периода
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+    
+    private long fibonacciModul(long n, int m) {    // вычисляет остаток числа 
+        if (n == 0) return 0;   // базовые случаи
+        if (n == 1) return 1;
+        
+        long prev = 0;      // первые числа фибоначчи по модулю m 
+        long curr = 1;
+        
+        for (long i = 2; i <= n; i++) {
+            long next = (prev + curr) % m;    // вычисление следующего числа
+            prev = curr;           // сдвиг значений для следующей итерации
+            curr = next;
+        }
+        
+        return curr;
+    }
 }
-
