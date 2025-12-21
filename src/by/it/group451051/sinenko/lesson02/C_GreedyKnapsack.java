@@ -14,6 +14,7 @@ package by.it.group451051.sinenko.lesson02;
  */
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class C_GreedyKnapsack {
@@ -38,8 +39,12 @@ public class C_GreedyKnapsack {
         public int compareTo(Item o) {
             //тут может быть ваш компаратор
 
+            //находим самый выгодный предмет на кг веса
+            double thisValue = (double) this.cost / this.weight; // вычисление стоимости на 1 кг для текущего объекта
+            double otherValue = (double) o.cost / o.weight;      // вычисление стоимости на 1 кг для другого объекта (о обьекта)
 
-            return 0;
+            return Double.compare(otherValue, thisValue);    //сравнение и возврат результата
+            // что больше по значению на 1кг, то и будет стоять раньше и с тем и пойдет работа
         }
     }
 
@@ -66,9 +71,23 @@ public class C_GreedyKnapsack {
         //кроме того, можете описать свой компаратор в классе Item
         //ваше решение.
 
+        Arrays.sort(items);  // сортировка items 
 
+        int remaining = W;  // переменная для оставшегося веса в рюкзаке
+    
+        for (Item item : items) {      // цикл идет по предметам от самого выгодного к менее выгодному
+            if (remaining <= 0) break; // если не осталось места то стоп
+        
+            if (item.weight <= remaining) {      // если вес предмета не больше оставшегося места
+                result += item.cost;             // то добавляем его стоимость
+                remaining -= item.weight;        // и уменьшаем оставшееся место
 
-
+            } else {            // если целый предмет не вмещается, то дробим его
+                double fraction = (double) remaining / item.weight; // вычисление какая часть предмета помещается
+                result += item.cost * fraction;    //прибавляем к итогу пропорциональную стоимость
+                remaining = 0;                    // в конце рюкзак полон 
+        }
+    }
 
         System.out.printf("Удалось собрать рюкзак на сумму %f\n",result);
         return result;
@@ -77,7 +96,7 @@ public class C_GreedyKnapsack {
     public static void main(String[] args) throws FileNotFoundException {
         long startTime = System.currentTimeMillis();
         String root=System.getProperty("user.dir")+"/src/";
-        File f=new File(root+"by/it/a_khmelev/lesson02/greedyKnapsack.txt");
+        File f=new File(root+"by/it/group451051/sinenko/lesson02/greedyKnapsack.txt");
         double costFinal=new C_GreedyKnapsack().calc(f);
         long finishTime = System.currentTimeMillis();
         System.out.printf("Общая стоимость %f (время %d)",costFinal,finishTime - startTime);
