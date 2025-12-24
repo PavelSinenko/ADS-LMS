@@ -43,21 +43,74 @@ public class C_HeapMax {
         //Будет мало? Ну тогда можете его собрать как Generic и/или использовать в варианте B
         private List<Long> heap = new ArrayList<>();
 
-        int siftDown(int i) { //просеивание вверх
-
-            return i;
+         // вспомогательные методы для навигации
+        private int parent(int i) {
+            return (i - 1) / 2;
+        }
+    
+        private int leftChild(int i) {
+            return 2 * i + 1;
+        }
+    
+        private int rightChild(int i) {
+            return 2 * i + 2;
         }
 
-        int siftUp(int i) { //просеивание вниз
+        int siftDown(int i) { //просеивание вниз*
 
+            int left = leftChild(i);
+            int right = rightChild(i);
+            int maxIndex = i;  // предполагаем что текущий элемент это максимум
+
+            // проверяем левого ребенка
+            if (left < heap.size() && heap.get(left) > heap.get(maxIndex)) {
+                maxIndex = left;
+            }
+ 
+            // проверяем правого ребенка
+            if (right < heap.size() && heap.get(right) > heap.get(maxIndex)) {
+                maxIndex = right;
+            }
+            // если нашли ребенка больше родителя
+            if (maxIndex != i) {
+                Long temp = heap.get(i);     // Меняем местами
+                heap.set(i, heap.get(maxIndex));
+                heap.set(maxIndex, temp);
+
+                siftDown(maxIndex); // рекурсивно продолжаем для новой позиции
+            }
+            return maxIndex;
+        }
+
+        int siftUp(int i) { //просеивание вверх*
+            while (i > 0 && heap.get(i) > heap.get(parent(i))) {// пока не дошли до корня и элемент больше родителя
+                Long temp = heap.get(i);            // меняем местами с родителем
+                heap.set(i, heap.get(parent(i)));
+                heap.set(parent(i), temp);
+            
+                i = parent(i);      // переходим к индексу родителя
+            }
             return i;
         }
 
         void insert(Long value) { //вставка
+            heap.add(value);           // добавляем элемент в конец
+            siftUp(heap.size() - 1);   // просеиваем вверх чтобы восстановить свойство кучи
         }
 
         Long extractMax() { //извлечение и удаление максимума
-            Long result = null;
+            if (heap.isEmpty()) {
+                return null;
+            }
+
+            Long result = heap.get(0);  // cохраняем корень
+            heap.set(0, heap.get(heap.size() - 1));  // последний элемент перемещаем в корень
+            heap.remove(heap.size() - 1);                   // удаляем последний элемент
+
+            // если куча не пуста то восстанавливаем свойство кучи
+            if (!heap.isEmpty()) {
+                siftDown(0);
+            }
 
             return result;
         }
@@ -92,7 +145,7 @@ public class C_HeapMax {
 
     public static void main(String[] args) throws FileNotFoundException {
         String root = System.getProperty("user.dir") + "/src/";
-        InputStream stream = new FileInputStream(root + "by/it/a_khmelev/lesson03/heapData.txt");
+        InputStream stream = new FileInputStream(root + "by/it/group451051/sinenko/lesson03/heapData.txt");
         C_HeapMax instance = new C_HeapMax();
         System.out.println("MAX="+instance.findMaxValue(stream));
     }
