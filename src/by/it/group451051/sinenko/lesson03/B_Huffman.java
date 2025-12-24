@@ -3,6 +3,8 @@ package by.it.group451051.sinenko.lesson03;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
 // Lesson 3. B_Huffman.
 // Восстановите строку по её коду и беспрефиксному коду символов.
@@ -51,16 +53,44 @@ public class B_Huffman {
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         //тут запишите ваше решение
 
+        // пропускаем перевод строки после чисел
+        scanner.nextLine();
 
+        // создаем HashMap для хранения кодов символов
+        Map<String, Character> codeToChar = new HashMap<>();
 
+        // читаем количество k строк с кодами символов
+        for (int i = 0; i < count; i++) {
+            String line = scanner.nextLine();         // собственно читаем строку
+            String[] parts = line.split(": "); // разбиваем строку и получаем массив из двух элементов
+            char symbol = parts[0].charAt(0);  // извлекаем символ из первой части строки    
+            String code = parts[1];                   // извлекаем код символа из второй части   
 
+            // сохраняем в HashMap
+            codeToChar.put(code, symbol);
+        }
+
+        // читаем закодированную строку
+        String encodedString = scanner.nextLine();
+
+        // декодирование строки
+        StringBuilder currentCode = new StringBuilder();
+
+        for (int i = 0; i < encodedString.length(); i++) {
+            currentCode.append(encodedString.charAt(i));   // добавляем очередной бит из закодированной строки к текущему коду
+            String code = currentCode.toString();         // преобразуем накопленные символы в строку-код
+            if (codeToChar.containsKey(code)) {           // проверка есть ли такой код в HashMap
+                result.append(codeToChar.get(code));      // если есть, то добавляем соответствующий символ к результату
+                currentCode.setLength(0);       //сброс текущего код для поиска следующего символа
+            }
+        }
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         return result.toString(); //01001100100111
     }
 
     public static void main(String[] args) throws FileNotFoundException {
         String root = System.getProperty("user.dir") + "/src/";
-        File f = new File(root + "by/it/a_khmelev/lesson03/encodeHuffman.txt");
+        File f = new File(root + "by/it/group451051/sinenko/lesson03/encodeHuffman.txt");
         B_Huffman instance = new B_Huffman();
         String result = instance.decode(f);
         System.out.println(result);
