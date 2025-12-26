@@ -35,17 +35,67 @@ public class B_MergeSort {
             System.out.println(a[i]);
         }
 
+        // вызов сортировки слиянием
+        mergeSort(a, 0, a.length - 1);
+
+        scanner.close();
+        return a;
+    }
         // тут ваше решение (реализуйте сортировку слиянием)
         // https://ru.wikipedia.org/wiki/Сортировка_слиянием
 
+        // сортировка слиянием
+        private void mergeSort(int[] arr, int left, int right) {
+            if (left < right) {
+                int mid = left + (right - left) / 2; // находим середину
 
+                mergeSort(arr, left, mid);       // сортировка левой половины
+                mergeSort(arr, mid + 1, right);  // сортировка правой
+                merge(arr, left, mid, right);    // слияние отсортированных половинок
+            } 
+        }
 
+        // cлияние двух отсортированных частей массива
+        private void merge(int[] arr, int left, int mid, int right) {
+            int[] temp = new int[right - left + 1]; // временный массив для слияния
 
+            int l = left;      // индекс для левой части
+            int r = mid + 1;   // для правой
+            int k = 0;         // для временного массива
 
+            while (l <= mid && r <= right) {
+                if (arr[l] <= arr[r]) {
+                    temp[k] = arr[l];
+                    l++;
+                } else {
+                    temp[k] = arr[r];
+                    r++;
+                }
+                k++;
+            }
+
+            // дописываем оставшиеся элементы из левой части
+            while (l <= mid) {
+                temp[k] = arr[l];
+                l++;
+                k++;
+            }
+
+            // из правой части
+            while (r <= right) {
+                temp[k] = arr[r];
+                r++;
+                k++;
+            }
+
+            // копируем отсортированные элементы в исходный массив
+            for (int m = 0; m < temp.length; m++) {
+                arr[left + m] = temp[m];
+            }
+        } 
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        return a;
-    }
+    
     public static void main(String[] args) throws FileNotFoundException {
         String root = System.getProperty("user.dir") + "/src/";
         InputStream stream = new FileInputStream(root + "by/it/a_khmelev/lesson04/dataB.txt");
@@ -57,6 +107,7 @@ public class B_MergeSort {
             System.out.print(index+" ");
         }
     }
-
-
 }
+
+
+
