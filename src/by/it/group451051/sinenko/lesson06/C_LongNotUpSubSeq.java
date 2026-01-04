@@ -44,15 +44,55 @@ public class C_LongNotUpSubSeq {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         //общая длина последовательности
         int n = scanner.nextInt();
-        int[] m = new int[n];
+        int[] m = new int[n];          // массив для хранения исходных чисел
+        int[] l = new int[n];       // массив для длин подпоследовательностей
+        int[] prev = new int [n];   // массив для индексов предыдущих элементов
+        int result = 0;
+        int lastIndex = -1;         // индекс последнего элемента в самой длинной подпоследовательности
+
         //читаем всю последовательность
         for (int i = 0; i < n; i++) {
             m[i] = scanner.nextInt();
-        }
+            l[i] = 1;                   // минимальная подпоследовательность это сам элемент
+            prev[i] = -1;               // минимальное значение потму что нет предыдущего элемента
+        
         //тут реализуйте логику задачи методами динамического программирования (!!!)
-        int result = 0;
+        
+        //перебор предыдущих перед i элементов
+            for (int j = 0; j < i; j++) {
+                // если j не меньше i, и цепочка через j будет длиннее чем текущая лучшая для i
+                // то берем этот более длинный вариант
+                if (m[j] >= m[i] && l[j] + 1 > l[i]) { 
+                    l[i] = l[j] + 1;        
+                    prev[i] = j;    //обозначаем предыдущий элемент
+                }
+            }
+            // обновляем максимальную длину
+            if (l[i] > result) {
+                result = l[i];
+                lastIndex = i;          // сохраняение индекса последнего элемента
+            }
+        }
+        // вывод длины 
+        System.out.println(result);
 
+        // нахождение и вывод индексов 
+        // если есть хотя бы одна цепочка
+        if (result > 0) {
+            int[] indexes = new int[result]; // массив для хранения индексов
+            int current = lastIndex;          // перебор начнется с конца
+            
+            for (int i = result - 1; i >= 0; i--) {
+                indexes[i] = current + 1;  // +1 чтобы получить нужный индекс
+                current = prev[current];   // после идем к предыдущему
+            }
 
+            // вывод индексов
+            for (int i = 0; i < result; i++) {
+                System.out.print(indexes[i] + " ");
+            }
+        }
+        scanner.close();
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
@@ -63,7 +103,6 @@ public class C_LongNotUpSubSeq {
         InputStream stream = new FileInputStream(root + "by/it/a_khmelev/lesson06/dataC.txt");
         C_LongNotUpSubSeq instance = new C_LongNotUpSubSeq();
         int result = instance.getNotUpSeqSize(stream);
-        System.out.print(result);
     }
 
 }
