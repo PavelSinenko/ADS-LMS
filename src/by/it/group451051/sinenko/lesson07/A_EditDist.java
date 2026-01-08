@@ -43,11 +43,36 @@ public class A_EditDist {
     int getDistanceEdinting(String one, String two) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
 
-        
-        int result = 0;
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-    return result;
+        // возврат функции
+        return changeLength(one, two, one.length(), two.length());
     }
+
+    int changeLength(String one, String two, int i, int j) {
+        // базовые случаи
+        if (i == 0) return j;
+        if (j == 0) return i;
+    
+        // если символы совпадают то ничего не меняем
+        // если разные то расстояние редактирования увеличивается
+        if (one.charAt(i - 1) == two.charAt(j - 1)) {
+            return changeLength(one, two, i - 1, j - 1); 
+        } else {        
+            return 1 + min(
+                changeLength(one, two, i - 1, j),     // удаление
+                changeLength(one, two, i, j - 1),     // вставка
+                changeLength(one, two, i - 1, j - 1)  // замена
+            );
+        }
+    }
+    
+    // вспомогательный метод для нахождения минимума из трех чисел
+    private static int min(int n1, int n2, int n3) {
+        return Math.min(Math.min(n1, n2), n3);
+    }
+        
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
     
 
 
