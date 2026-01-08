@@ -3,6 +3,8 @@ package by.it.group451051.sinenko.lesson07;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /*
@@ -52,10 +54,86 @@ public class C_EditDist {
     String getDistanceEdinting(String one, String two) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
 
+        // ВЫЧИСЛЕНИЕ ТАБЛИЦЫ РАССТОЯНИЙ ПРЕОБРАЗОВАНИЯ СТРОК
 
-        String result = "";
+        int n = one.length();  // длина первой строки
+        int m = two.length();  // длина второй
+
+        // матрица 
+        int[][] matr = new int[n + 1][m + 1];
+
+        // заполнение первой строки матрицы
+        for (int j = 0; j <= m; j++) {
+            matr[0][j] = j;
+        }
+        // заполнение первого столбца
+        for (int i = 0; i <= n; i++) {
+            matr[i][0] = i;
+        }
+
+        // заполение остальной матрицы
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                // проверка совпадают ли символы
+                if (one.charAt(i - 1) == two.charAt(j - 1)) {
+                    matr[i][j] = matr[i - 1][j - 1];
+                } else {
+                     matr[i][j] = 1 + Math.min(Math.min(
+                        matr[i - 1][j],          // удаление 
+                        matr[i][j - 1] ),        // вставка
+                        matr[i - 1][j - 1] );    // замена
+                                                    
+                }
+            }
+        }
+
+        // УЧАСТОК ВОССТАНОВЛЕНИЯ ОПЕРАЦИЙ ПРЕОБРАЗОВАНИЯ ЧТО ВЫЧИСЛИЛИ В МАТРИЦЕ
+
+        // указатели 
+        int i = n;   // сколько символов из one уже обработали
+        int j = m;   // сколько из two 
+
+        // список для команд
+        List<String> operations = new ArrayList<>(); 
+
+        // пока не обработаны все символы строк
+        while (i > 0 || j > 0) {
+            // если ещё есть символы в обеих строках И
+            // текущие символы одинаковые И  
+            // расстояние не увеличилось при переходе к этим символам
+            if (i > 0 && j > 0 && 
+                one.charAt(i-1) == two.charAt(j-1) && 
+                matr[i][j] == matr[i-1][j-1]) {
+                    // копируем
+                    operations.add("#,");
+                    i--;
+                    j--;
+                } else if (i > 0 && j > 0 && 
+                    matr[i][j] == matr[i-1][j-1] + 1) {
+                    // иначе или замена
+                    operations.add("~" + two.charAt(j-1) + ",");
+                    i--;
+                    j--;
+                } else if (i > 0 && matr[i][j] == matr[i-1][j] + 1) {
+                    // или удаление
+                    operations.add("-" + one.charAt(i-1) + ",");
+                    i--;
+                } else {
+                    // вставка
+                    operations.add("+" + two.charAt(j-1) + ",");
+                    j--;
+                }
+        }
+
+        
+        // разворот операциий
+        StringBuilder result = new StringBuilder();
+        for (int k = operations.size() - 1; k >= 0; k--) {
+            result.append(operations.get(k));
+        }
+
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        return result;
+        return result.toString();
     }
 
 
