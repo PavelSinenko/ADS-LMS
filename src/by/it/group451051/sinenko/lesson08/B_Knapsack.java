@@ -40,10 +40,10 @@ public class B_Knapsack {
             gold[i]=scanner.nextInt();
         }
 
-        // 
+        // сейчас идем с конца , чтобы брать только 1 вариант слитка
         for(int j = 0; j < n; j++) {    // перебор по слиткам       
             for (int i = w; i >= gold[j]; i--) { // по вместимости но уже с конца
-                // если слиток помещается, то берем тот что лучше
+                // если слиток помещается, то берем тот что больше
                 if (gold[j] <= i) {   
                     maxWeight[i] = Math.max(maxWeight[i], maxWeight[i - gold[j]] + gold[j]); 
                 }
