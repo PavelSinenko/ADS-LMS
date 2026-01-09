@@ -31,15 +31,28 @@ public class B_Knapsack {
     int getMaxWeight(InputStream stream ) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         Scanner scanner = new Scanner(stream);
-        int w=scanner.nextInt();
-        int n=scanner.nextInt();
-        int gold[]=new int[n];
+        int w=scanner.nextInt();             // вместимость рюкзака
+        int n=scanner.nextInt();             // количество видов слитков
+        int gold[]=new int[n];               // веса слитков
+        int[] maxWeight = new int[w + 1];    // максимальный вес который можно набрать
+
         for (int i = 0; i < n; i++) {
             gold[i]=scanner.nextInt();
         }
 
+        // 
+        for(int j = 0; j < n; j++) {    // перебор по слиткам       
+            for (int i = w; i >= gold[j]; i--) { // по вместимости но уже с конца
+                // если слиток помещается, то берем тот что лучше
+                if (gold[j] <= i) {   
+                    maxWeight[i] = Math.max(maxWeight[i], maxWeight[i - gold[j]] + gold[j]); 
+                }
+            }
+        }
 
-        int result = 0;
+
+        scanner.close();
+        int result = maxWeight[w];
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
