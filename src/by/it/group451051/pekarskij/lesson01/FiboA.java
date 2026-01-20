@@ -2,10 +2,6 @@ package by.it.group451051.pekarskij.lesson01;
 
 import java.math.BigInteger;
 
-/*
- * Вам необходимо выполнить рекурсивный способ вычисления чисел Фибоначчи
- */
-
 public class FiboA {
 
     private long startTime = System.currentTimeMillis();

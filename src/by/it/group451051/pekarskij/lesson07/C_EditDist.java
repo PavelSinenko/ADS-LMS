@@ -5,63 +5,73 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-/*
-Задача на программирование: расстояние Левенштейна
-    https://ru.wikipedia.org/wiki/Расстояние_Левенштейна
-    http://planetcalc.ru/1721/
-
-Дано:
-    Две данных непустые строки длины не более 100, содержащие строчные буквы латинского алфавита.
-
-Необходимо:
-    Решить задачу МЕТОДАМИ ДИНАМИЧЕСКОГО ПРОГРАММИРОВАНИЯ
-    Итерационно вычислить алгоритм преобразования двух данных непустых строк
-    Вывести через запятую редакционное предписание в формате:
-     операция("+" вставка, "-" удаление, "~" замена, "#" копирование)
-     символ замены или вставки
-
-    Sample Input 1:
-    ab
-    ab
-    Sample Output 1:
-    #,#,
-
-    Sample Input 2:
-    short
-    ports
-    Sample Output 2:
-    -s,~p,#,#,#,+s,
-
-    Sample Input 3:
-    distance
-    editing
-    Sample Output 2:
-    +e,#,#,-s,#,~i,#,-c,~g,
-
-
-    P.S. В литературе обычно действия редакционных предписаний обозначаются так:
-    - D (англ. delete) — удалить,
-    + I (англ. insert) — вставить,
-    ~ R (replace) — заменить,
-    # M (match) — совпадение.
-*/
-
-
 public class C_EditDist {
 
-    String getDistanceEdinting(String one, String two) {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    String getDistanceEdinting(String a, String b) {
+    int n = a.length();
+    int m = b.length();
 
+    int[][] dp = new int[n + 1][m + 1];
 
-        String result = "";
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        return result;
+    // базовые случаи
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+
+    // заполнение таблицы
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            int same = (a.charAt(i - 1) == b.charAt(j - 1)) ? 0 : 1;
+
+            int del = dp[i - 1][j] + 1;
+            int ins = dp[i][j - 1] + 1;
+            int rep = dp[i - 1][j - 1] + same;
+
+            dp[i][j] = Math.min(del, Math.min(ins, rep));
+        }
     }
+
+    // восстановление предписания
+    StringBuilder out = new StringBuilder();
+    int i = n, j = m;
+
+    while (i > 0 || j > 0) {
+
+        // совпадение или замена
+        if (i > 0 && j > 0) {
+            int same = (a.charAt(i - 1) == b.charAt(j - 1)) ? 0 : 1;
+
+            if (dp[i][j] == dp[i - 1][j - 1] + same) {
+                if (same == 0) {
+                    out.append("#,");
+                } else {
+                    out.append("~").append(b.charAt(j - 1)).append(",");
+                }
+                i--; j--;
+                continue;
+            }
+        }
+
+        // вставка
+        if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
+            out.append("+").append(b.charAt(j - 1)).append(",");
+            j--;
+            continue;
+        }
+
+        // удаление
+        if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
+            out.append("-").append(a.charAt(i - 1)).append(",");
+            i--;
+        }
+    }
+
+    return out.toString();
+}
 
 
     public static void main(String[] args) throws FileNotFoundException {
         String root = System.getProperty("user.dir") + "/src/";
-        InputStream stream = new FileInputStream(root + "by/it/a_khmelev/lesson07/dataABC.txt");
+        InputStream stream = new FileInputStream(root + "by/it/group451051/pekarskij/lesson07/dataABC.txt");
         C_EditDist instance = new C_EditDist();
         Scanner scanner = new Scanner(stream);
         System.out.println(instance.getDistanceEdinting(scanner.nextLine(),scanner.nextLine()));
