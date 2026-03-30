@@ -12,71 +12,165 @@ public class ListB<E> implements List<E> {
     //////               Обязательные к реализации методы             ///////
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
+    
+    private Object[] elements;  // массив для хранения элементов
+    private int size;           // количество элементов в списке
+    private static final int DEFAULT_CAPACITY = 10;  // начальный размер массива
+
+    public ListB() {
+        elements = new Object[DEFAULT_CAPACITY]; // создаём массив для хранения элементов
+        size = 0;                                // изначально элементов 0
+    }
+
     @Override
     public String toString() {
-        return "";
+        StringBuilder sb = new StringBuilder("[");   // объект для сборки строки, начинаем с символа [ 
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(", ");       // после первого элемента всем следующим добавляем запятую
+            sb.append(elements[i]);               // плюс сам элемент
+        }
+        sb.append("]");         //закрывает строку скобка
+        return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        return false;
+        // если массив заполнен то расширяем его
+        if (size == elements.length) { 
+            Object[] newElements = new Object[elements.length * 3 / 2 + 1];       // создаём новый массив большего размера
+            System.arraycopy(elements, 0, newElements, 0, size);  // копируем все элементы в новый массив
+            elements = newElements;                                                // замена старого массива
+        }
+
+        elements[size] = e;
+        size++;
+
+        return true;
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        // проверка индекса
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        // сохраняем удаляемый элемент
+        E removed = (E) elements[index];
+
+        // сдвиг элементов влево
+        for (int i = index; i < size - 1; i++) {
+            elements[i] = elements[i + 1];
+        }
+
+        // освобождаем ссылку
+        elements[size - 1] = null;  
+        size--;
+        
+        return removed;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     @Override
-    public void add(int index, E element) {
-
+    public void add(int index, E element) { // добавление элемента по индексу
+        if (index < 0 || index > size) {    // проверка индекса 
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size); // если индекс не в пределах от 0 до size, то выбрасываем исключение
+        }
+        if (size == elements.length) { // если массив заполнен, то расширяем его
+            grow();
+        }
+        for (int i = size; i > index; i--) { // сдвигаем элементы вправо, начиная с последнего до индекса
+            elements[i] = elements[i - 1];
+        } 
+        elements[index] = element; // вставляем новый элемент на нужную позицию
+        size++;
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(Object o) { // удаление элемента по значению
+        for (int i = 0; i < size; i++) {    
+            if (Objects.equals(elements[i], o)) { // если элемент найден, то удаляем его и возвращаем true
+                remove(i);
+                return true;    
+            }
+        }
         return false;
     }
 
     @Override
-    public E set(int index, E element) {
-        return null;
+    public E set(int index, E element) {     // замена элемента по индексу
+        checkIndex(index);                   // проверка индекса
+        @SuppressWarnings("unchecked")       // сохраняем старый элемент для возврата
+        E old = (E) elements[index];         // заменяем элемент на новый
+        elements[index] = element;           // возвращаем старый элемент
+        return old;
     }
+    
 
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size == 0;        // список пуст, если size равен 0
     }
 
 
     @Override
-    public void clear() {
-
+    public void clear() {     // очистка списка, освобождение всех ссылок и установка размера в 0
+        for (int i = 0; i < size; i++) {       
+            elements[i] = null;
+        }
+        size = 0;
     }
 
     @Override
-    public int indexOf(Object o) {
-        return 0;
+    public int indexOf(Object o) {         // поиск индекса первого вхождения элемента
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(elements[i], o)) {    // если элемент найден, возвращаем его индекс
+                return i;
+            }
+        }
+        return -1;       // если элемент не найден, возвращаем -1
     }
 
     @Override
-    public E get(int index) {
-        return null;
+    public E get(int index) {              // получение элемента по индексу
+        checkIndex(index);                 // проверка индекса
+        @SuppressWarnings("unchecked")     // приведение к типу E
+        E result = (E) elements[index];    // возвращаем элемент
+        return result;
     }
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        return indexOf(o) >= 0;              // элемент содержится в списке, если его индекс не равен -1
     }
 
     @Override
-    public int lastIndexOf(Object o) {
-        return 0;
+    public int lastIndexOf(Object o) {      // поиск индекса последнего вхождения элемента
+        for (int i = size - 1; i >= 0; i--) {
+            if (Objects.equals(elements[i], o)) {     // если элемент найден, возвращаем его индекс
+                return i;
+            }
+        }
+        return -1;        // если элемент не найден, возвращаем -1
+    }
+
+    // вспомогательные методы
+    private void grow() {        // расширение массива при необходимости
+        int newCapacity = elements.length * 3 / 2 + 1;                         // новый размер массива
+        Object[] newElements = new Object[newCapacity];                        // создаём новый массив
+        System.arraycopy(elements, 0, newElements, 0, size);   // копируем все элементы в новый массив
+        elements = newElements;                                                // замена старого массива
+    }
+
+    private void checkIndex(int index) {  // проверка индекса на валидность
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);    // если индекс не в пределах от 0 до size-1, то выбрасываем исключение
+        }
     }
 
 
