@@ -175,7 +175,8 @@ public class MySplayMap implements Map<Integer, String>, SortedMap<Integer, Stri
         return sb.toString();
     }
     
-    // Вспомогательные рекурсивные методы
+    // ==================== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ====================
+    
     private Node getRecursive(Node node, Integer key) {
         if (node == null) return null;
         if (key < node.key) return getRecursive(node.left, key);
@@ -242,26 +243,101 @@ public class MySplayMap implements Map<Integer, String>, SortedMap<Integer, Stri
     
     private void subMapRecursive(Node node, Integer from, Integer to, MySplayMap result) {
         if (node == null) return;
-        if (node.key > from) subMapRecursive(node.left, from, to, result);
+        subMapRecursive(node.left, from, to, result);
         if (node.key >= from && node.key < to) result.put(node.key, node.value);
-        if (node.key < to) subMapRecursive(node.right, from, to, result);
+        subMapRecursive(node.right, from, to, result);
     }
     
     private void headMapRecursive(Node node, Integer toKey, MySplayMap result) {
         if (node == null) return;
-        if (node.key < toKey) {
-            result.put(node.key, node.value);
-            headMapRecursive(node.right, toKey, result);
-        }
         headMapRecursive(node.left, toKey, result);
+        if (node.key < toKey) result.put(node.key, node.value);
+        headMapRecursive(node.right, toKey, result);
     }
     
     private void tailMapRecursive(Node node, Integer fromKey, MySplayMap result) {
         if (node == null) return;
-        if (node.key >= fromKey) {
-            result.put(node.key, node.value);
-            tailMapRecursive(node.left, fromKey, result);
-        }
+        tailMapRecursive(node.left, fromKey, result);
+        if (node.key >= fromKey) result.put(node.key, node.value);
         tailMapRecursive(node.right, fromKey, result);
+    }
+    
+    // ==================== НАВИГАЦИОННЫЕ МЕТОДЫ ====================
+    
+    public Integer lowerKey(Integer key) {
+        Node node = root;
+        Integer result = null;
+        while (node != null) {
+            if (node.key < key) {
+                result = node.key;
+                node = node.right;
+            } else {
+                node = node.left;
+            }
+        }
+        return result;
+    }
+    
+    public Integer floorKey(Integer key) {
+        Node node = root;
+        Integer result = null;
+        while (node != null) {
+            if (node.key <= key) {
+                result = node.key;
+                node = node.right;
+            } else {
+                node = node.left;
+            }
+        }
+        return result;
+    }
+    
+    public Integer ceilingKey(Integer key) {
+        Node node = root;
+        Integer result = null;
+        while (node != null) {
+            if (node.key >= key) {
+                result = node.key;
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+        return result;
+    }
+    
+    public Integer higherKey(Integer key) {
+        Node node = root;
+        Integer result = null;
+        while (node != null) {
+            if (node.key > key) {
+                result = node.key;
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+        return result;
+    }
+    
+    // Перегрузки для Object (на случай, если тест ищет именно их)
+    public Integer lowerKey(Object key) {
+        if (!(key instanceof Integer)) return null;
+        return lowerKey((Integer) key);
+    }
+    
+    public Integer floorKey(Object key) {
+        if (!(key instanceof Integer)) return null;
+        return floorKey((Integer) key);
+    }
+    
+    public Integer ceilingKey(Object key) {
+        if (!(key instanceof Integer)) return null;
+        return ceilingKey((Integer) key);
+    }
+    
+    public Integer higherKey(Object key) {
+        if (!(key instanceof Integer)) return null;
+        return higherKey((Integer) key);
     }
 }
